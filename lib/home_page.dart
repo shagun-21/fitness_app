@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'colors.dart' as color;
@@ -10,12 +12,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List info = [];
+
+  _initData() {
+    DefaultAssetBundle.of(context).loadString("json/info.json").then((value) {
+      info = json.decode(value);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: color.AppColor.homePageBackground,
       body: Container(
-        padding: EdgeInsets.only(top: 70, left: 30, right: 30),
+        padding: EdgeInsets.only(top: 30, left: 30, right: 30),
         //Main Column of Home PAge
         child: Column(
           children: [
@@ -53,7 +69,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             SizedBox(
-              height: 30,
+              height: 15,
             ),
             Row(
               children: [
@@ -82,13 +98,13 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
-            
+
             SizedBox(
               height: 20,
             ),
             Container(
               width: MediaQuery.of(context).size.width,
-              height: 220,
+              height: 180,
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
                   color.AppColor.gradientFirst.withOpacity(0.8),
@@ -120,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'Next Workout',
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 12,
                           color: color.AppColor.homePageContainerTextSmall),
                     ),
                     SizedBox(
@@ -129,17 +145,17 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'Legs Toning',
                       style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 20,
                           color: color.AppColor.homePageContainerTextSmall),
                     ),
                     Text(
                       'and Glutes Workout',
                       style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 20,
                           color: color.AppColor.homePageContainerTextSmall),
                     ),
                     SizedBox(
-                      height: 35,
+                      height: 25,
                     ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -166,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                         Expanded(child: Container()),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(40),
                             boxShadow: [
                               BoxShadow(
                                   color: color.AppColor.gradientFirst,
@@ -177,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                           child: Icon(
                             Icons.play_circle_fill,
                             color: Colors.white,
-                            size: 50,
+                            size: 40,
                           ),
                         )
                       ],
@@ -185,99 +201,195 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-            )
-            ,SizedBox(height: 5,),
-                  Container(
-              height: 180,
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Container(
+              height: 160,
               width: MediaQuery.of(context).size.width,
               child: Stack(
                 children: [
                   Container(
                     margin: EdgeInsets.only(top: 30),
                     width: MediaQuery.of(context).size.width,
-                    height: 120,
+                    height: 100,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                            image: AssetImage('assets/card.jpg'),
+                            fit: BoxFit.fill),
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 30,
+                              offset: Offset(8, 10),
+                              color: color.AppColor.gradientSecond
+                                  .withOpacity(0.3)),
+                          BoxShadow(
+                              blurRadius: 10,
+                              offset: Offset(-1, -5),
+                              color: color.AppColor.gradientSecond
+                                  .withOpacity(0.3))
+                        ]),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 200, bottom: 30),
+                    height: 200,
+                    width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      image: DecorationImage(image: AssetImage('assets/card.jpg'),
-                      fit: BoxFit.fill
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 40,
-                          offset: Offset(8,10),
-                          color: color.AppColor.gradientSecond.withOpacity(0.3)
-
+                      image: DecorationImage(
+                        image: AssetImage(
+                          'assets/figure.png',
                         ),
-                        BoxShadow(
-                          blurRadius: 10,
-                          offset: Offset(-1,-5),
-                          color: color.AppColor.gradientSecond.withOpacity(0.3)
-
-                        )
-                      ]
-                      
-                    
-                    ),),
-                    Container(
-                      margin: EdgeInsets.only(right: 200,bottom: 30),
-                      height: 200,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                    
-                      borderRadius: BorderRadius.circular(20),
-                      image: DecorationImage(image: AssetImage('assets/figure.png'),
-                      
                       ),
-              
                     ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(left: 150,top: 50),
-                      width: double.maxFinite,
-                      height: 100,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Your are doing great",
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(left: 150, top: 40),
+                    width: double.maxFinite,
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Your are doing great",
                           style: TextStyle(
-                            color:color.AppColor.homePageDetail,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold
-                          ),),
-                          SizedBox(height: 10,),
-                          RichText(text: TextSpan(
-                            text: "Keep it up\n",
-                            style: TextStyle(
-                              color: color.AppColor.homePagePlanColor,
-                              fontSize: 16
-                            ),
-                            children: [
-                              TextSpan(
-                                text: "stick to your plan"
-                              )
-                            ]
-                          ))
-                        ],
-                      ),
-                    )
-                    
+                              color: color.AppColor.homePageDetail,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        RichText(
+                            text: TextSpan(
+                                text: "Keep it up\n",
+                                style: TextStyle(
+                                    color: color.AppColor.homePagePlanColor,
+                                    fontSize: 16),
+                                children: [
+                              TextSpan(text: "stick to your plan")
+                            ]))
+                      ],
+                    ),
+                  )
                 ],
               ),
-         ),
-         Row(
-           children: [
-             Text("Area of focus",
-             //textAlign: TextAlign.center,
-             style: TextStyle(
-                color:color.AppColor.homePageTitle,
-                fontSize: 25,
-                fontWeight: FontWeight.w500,
-             ),
-             )
-           ],
-         ),
-         //isha continue from here
-         
+            ),
+            Row(
+              children: [
+                Text(
+                  "Area of focus",
+                  //textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: color.AppColor.homePageTitle,
+                    fontSize: 23,
+                    fontWeight: FontWeight.w500,
+                  ),
+                )
+              ],
+            ),
+            //isha continue from here
+            Expanded(
+                child: OverflowBox(
+              maxWidth: MediaQuery.of(context).size.width,
+              child: MediaQuery.removePadding(
+                removeTop: true,
+                context: context,
+                child: ListView.builder(
+                    itemCount: (info.length.toDouble() / 2).toInt(),
+                    itemBuilder: (_, i) {
+                      int a = 2 * i;
+                      int b = (2 * i) + 1;
+                      return Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(bottom: 5),
+                            width: (MediaQuery.of(context).size.width - 90) / 2,
+                            height: 150,
+                            margin:
+                                EdgeInsets.only(left: 30, bottom: 15, top: 15),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                    info[a]["img"],
+                                  ),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 3,
+                                    offset: Offset(5, 5),
+                                    color: color.AppColor.gradientSecond
+                                        .withOpacity(0.1),
+                                  ),
+                                  BoxShadow(
+                                    blurRadius: 3,
+                                    offset: Offset(-5, -5),
+                                    color: color.AppColor.gradientSecond
+                                        .withOpacity(0.1),
+                                  ),
+                                ]),
+                            child: Center(
+                                child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                info[a]["title"],
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: color.AppColor.homePageDetail),
+                              ),
+                            )),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(bottom: 5),
+                            width: (MediaQuery.of(context).size.width - 90) / 2,
+                            height: 150,
+                            margin: EdgeInsets.only(
+                              left: 30,
+                              bottom: 15,
+                              top: 15,
+                            ),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                    info[b]["img"],
+                                  ),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 3,
+                                    offset: Offset(5, 5),
+                                    color: color.AppColor.gradientSecond
+                                        .withOpacity(0.1),
+                                  ),
+                                  BoxShadow(
+                                    blurRadius: 3,
+                                    offset: Offset(-5, -5),
+                                    color: color.AppColor.gradientSecond
+                                        .withOpacity(0.1),
+                                  ),
+                                ]),
+                            child: Center(
+                                child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                info[b]["title"],
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: color.AppColor.homePageDetail),
+                              ),
+                            )),
+                          ),
+                        ],
+                      );
+                    }),
+              ),
+            )),
           ],
         ),
       ),
