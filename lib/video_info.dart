@@ -12,11 +12,11 @@ class VideoInfo extends StatefulWidget {
 }
 
 class _VideoInfoState extends State<VideoInfo> {
-  List info = [];
+  List Videoinfo = [];
 
   _initData() {
     DefaultAssetBundle.of(context).loadString("json/videoinfo.json").then((value) {
-      info = json.decode(value);
+      Videoinfo = json.decode(value);
     });
   }
 
@@ -178,8 +178,29 @@ class _VideoInfoState extends State<VideoInfo> {
                       ],
                     )]
                     ,)
-                  ],
-                ),))
+                ,Expanded(child: ListView.builder(
+                      itemBuilder: (_ ,int index){
+                            itemCount:Videoinfo.length;
+                      return GestureDetector(
+                        onTap: (){
+                          debugPrint(index.toString());
+                        },
+                        child: Container(
+                          height: 135,
+                          width: 200,
+                          color: Colors.redAccent,
+                          child: Column(
+                            children: [
+                                //Isha continue from here 
+                            ],
+                          ),
+                        ),
+                      );
+                      
+                },))  ],
+                ),
+                )
+                )
               ],
             ),
       ),
