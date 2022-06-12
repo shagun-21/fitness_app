@@ -12,6 +12,7 @@ class VideoInfo extends StatefulWidget {
 }
 
 class _VideoInfoState extends State<VideoInfo> {
+  bool _playArea= false;
   List Videoinfo = [];
 
   _initData() async {
@@ -34,14 +35,17 @@ class _VideoInfoState extends State<VideoInfo> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: _playArea==false?BoxDecoration(
             gradient: LinearGradient(colors: [
           color.AppColor.gradientFirst.withOpacity(0.9),
           color.AppColor.gradientSecond
-        ], begin: const FractionalOffset(0.0, 0.4), end: Alignment.topRight)),
+        ], begin: const FractionalOffset(0.0, 0.4), end: Alignment.topRight)):BoxDecoration(
+          color: color.AppColor.gradientSecond,
+
+        ),
         child: Column(
           children: [
-            Container(
+            _playArea==false?Container(
               padding: EdgeInsets.only(top: 70, left: 30, right: 30),
               width: MediaQuery.of(context).size.width,
               height: 300,
@@ -166,6 +170,29 @@ class _VideoInfoState extends State<VideoInfo> {
                   )
                 ],
               ),
+            ):Container(
+              child: Column(
+                children: [
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.only(top: 50,left: 30, right: 30),
+                    child: Row(children: [
+                      InkWell(
+                        onTap:(){
+                          debugPrint("tapped");
+                        } ,
+                        child: Icon(Icons.arrow_back_ios,size: 20,
+                        color: color.AppColor.secondPageIconColor,),
+                        
+                      ),Expanded(child: Container()),
+                      Icon(Icons.info_outline,
+                      size: 20,
+                      color: Colors.white,)
+                    ]),
+                  ),
+                  _playView(context)
+                ],
+              ),
             ),
             Expanded(
                 child: Container(
@@ -228,6 +255,10 @@ class _VideoInfoState extends State<VideoInfo> {
     );
   }
 
+  _playView(BuildContext context){
+
+  }
+
   _listView() {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
@@ -237,6 +268,11 @@ class _VideoInfoState extends State<VideoInfo> {
           onTap: () {
             debugPrint(index.toString());
             // sir continue from here
+            setState(() {
+              if(_playArea==false){
+                _playArea=true;
+              }
+            });
           },
           child: _buildCard(index),
         );
