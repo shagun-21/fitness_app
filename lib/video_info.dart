@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:video_player/video_player.dart';
 import 'colors.dart' as color;
 
 class VideoInfo extends StatefulWidget {
@@ -12,7 +13,7 @@ class VideoInfo extends StatefulWidget {
 }
 
 class _VideoInfoState extends State<VideoInfo> {
-  bool _playArea= false;
+  bool _playArea = false;
   List Videoinfo = [];
 
   _initData() async {
@@ -35,165 +36,179 @@ class _VideoInfoState extends State<VideoInfo> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: _playArea==false?BoxDecoration(
-            gradient: LinearGradient(colors: [
-          color.AppColor.gradientFirst.withOpacity(0.9),
-          color.AppColor.gradientSecond
-        ], begin: const FractionalOffset(0.0, 0.4), end: Alignment.topRight)):BoxDecoration(
-          color: color.AppColor.gradientSecond,
-
-        ),
+        decoration: _playArea == false
+            ? BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [
+                    color.AppColor.gradientFirst.withOpacity(0.9),
+                    color.AppColor.gradientSecond
+                  ],
+                    begin: const FractionalOffset(0.0, 0.4),
+                    end: Alignment.topRight))
+            : BoxDecoration(
+                color: color.AppColor.gradientSecond,
+              ),
         child: Column(
           children: [
-            _playArea==false?Container(
-              padding: EdgeInsets.only(top: 70, left: 30, right: 30),
-              width: MediaQuery.of(context).size.width,
-              height: 300,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Get.back();
-                        },
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          size: 20,
-                          color: color.AppColor.secondPageIconColor,
-                        ),
-                      ),
-                      Expanded(child: Container()),
-                      Icon(
-                        Icons.info_outline,
-                        size: 20,
-                        color: color.AppColor.secondPageIconColor,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    'Legs Toning',
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: color.AppColor.secondPageTitleColor),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'and Glutes Workout',
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: color.AppColor.secondPageTitleColor),
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        height: 30,
-                        width: 90,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: LinearGradient(
-                                colors: [
-                                  color.AppColor
-                                      .secondPageContainerGradient1stColor,
-                                  color.AppColor
-                                      .secondPageContainerGradient2ndColor
-                                ],
-                                begin: Alignment.bottomLeft,
-                                end: Alignment.topRight)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+            _playArea == false
+                ? Container(
+                    padding: EdgeInsets.only(top: 70, left: 30, right: 30),
+                    width: MediaQuery.of(context).size.width,
+                    height: 300,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
+                            InkWell(
+                              onTap: () {
+                                Get.back();
+                              },
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                size: 20,
+                                color: color.AppColor.secondPageIconColor,
+                              ),
+                            ),
+                            Expanded(child: Container()),
                             Icon(
-                              Icons.timer,
-                              color: color.AppColor.secondPageIconColor,
+                              Icons.info_outline,
                               size: 20,
+                              color: color.AppColor.secondPageIconColor,
                             ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              "68 min",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: color.AppColor.secondPageIconColor),
-                            )
                           ],
                         ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Container(
-                        height: 30,
-                        width: 240,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: LinearGradient(
-                                colors: [
-                                  color.AppColor
-                                      .secondPageContainerGradient1stColor,
-                                  color.AppColor
-                                      .secondPageContainerGradient2ndColor
-                                ],
-                                begin: Alignment.bottomLeft,
-                                end: Alignment.topRight)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Text(
+                          'Legs Toning',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: color.AppColor.secondPageTitleColor),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          'and Glutes Workout',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: color.AppColor.secondPageTitleColor),
+                        ),
+                        SizedBox(
+                          height: 50,
+                        ),
+                        Row(
                           children: [
-                            Icon(
-                              Icons.handyman_outlined,
-                              color: color.AppColor.secondPageIconColor,
-                              size: 20,
+                            Container(
+                              height: 30,
+                              width: 90,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: LinearGradient(
+                                      colors: [
+                                        color.AppColor
+                                            .secondPageContainerGradient1stColor,
+                                        color.AppColor
+                                            .secondPageContainerGradient2ndColor
+                                      ],
+                                      begin: Alignment.bottomLeft,
+                                      end: Alignment.topRight)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.timer,
+                                    color: color.AppColor.secondPageIconColor,
+                                    size: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    "68 min",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color:
+                                            color.AppColor.secondPageIconColor),
+                                  )
+                                ],
+                              ),
                             ),
                             SizedBox(
-                              width: 5,
+                              width: 20,
                             ),
-                            Text(
-                              "Resistance band, kettlebell",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: color.AppColor.secondPageIconColor),
-                            )
+                            Container(
+                              height: 30,
+                              width: 240,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient: LinearGradient(
+                                      colors: [
+                                        color.AppColor
+                                            .secondPageContainerGradient1stColor,
+                                        color.AppColor
+                                            .secondPageContainerGradient2ndColor
+                                      ],
+                                      begin: Alignment.bottomLeft,
+                                      end: Alignment.topRight)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.handyman_outlined,
+                                    color: color.AppColor.secondPageIconColor,
+                                    size: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    "Resistance band, kettlebell",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color:
+                                            color.AppColor.secondPageIconColor),
+                                  )
+                                ],
+                              ),
+                            ),
                           ],
-                        ),
-                      ),
-                    ],
+                        )
+                      ],
+                    ),
                   )
-                ],
-              ),
-            ):Container(
-              child: Column(
-                children: [
-                  Container(
-                    height: 100,
-                    padding: EdgeInsets.only(top: 50,left: 30, right: 30),
-                    child: Row(children: [
-                      InkWell(
-                        onTap:(){
-                          debugPrint("tapped");
-                        } ,
-                        child: Icon(Icons.arrow_back_ios,size: 20,
-                        color: color.AppColor.secondPageIconColor,),
-                        
-                      ),Expanded(child: Container()),
-                      Icon(Icons.info_outline,
-                      size: 20,
-                      color: Colors.white,)
-                    ]),
+                : Container(
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 100,
+                          padding:
+                              EdgeInsets.only(top: 50, left: 30, right: 30),
+                          child: Row(children: [
+                            InkWell(
+                              onTap: () {
+                                debugPrint("tapped");
+                              },
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                size: 20,
+                                color: color.AppColor.secondPageIconColor,
+                              ),
+                            ),
+                            Expanded(child: Container()),
+                            Icon(
+                              Icons.info_outline,
+                              size: 20,
+                              color: Colors.white,
+                            )
+                          ]),
+                        ),
+                        _playView(context)
+                      ],
+                    ),
                   ),
-                  _playView(context)
-                ],
-              ),
-            ),
             Expanded(
                 child: Container(
               decoration: BoxDecoration(
@@ -255,8 +270,11 @@ class _VideoInfoState extends State<VideoInfo> {
     );
   }
 
-  _playView(BuildContext context){
+  _playView(BuildContext context) {}
 
+  _onTapVideo(int index) {
+    final controller =
+        VideoPlayerController.network(Videoinfo[index]['videoUrl']);
   }
 
   _listView() {
@@ -266,11 +284,12 @@ class _VideoInfoState extends State<VideoInfo> {
       itemBuilder: (_, int index) {
         return GestureDetector(
           onTap: () {
+            _onTapVideo(index);
             debugPrint(index.toString());
             // sir continue from here
             setState(() {
-              if(_playArea==false){
-                _playArea=true;
+              if (_playArea == false) {
+                _playArea = true;
               }
             });
           },
