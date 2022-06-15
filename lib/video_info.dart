@@ -272,14 +272,14 @@ class _VideoInfoState extends State<VideoInfo> {
   }
 
   _playView(BuildContext context) {
-    final controller = _controller;
-    if (controller != null && controller.value.isInitialized) {
+    final controller =_controller;
+    if(controller!=null &&controller.value.isInitialized){
       return Container(
         height: 300,
         width: 300,
         child: VideoPlayer(controller),
       );
-    } else {
+    }else{
       return Text("Being initialized please wait");
     }
   }
