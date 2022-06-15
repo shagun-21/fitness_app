@@ -15,6 +15,7 @@ class VideoInfo extends StatefulWidget {
 class _VideoInfoState extends State<VideoInfo> {
   bool _playArea = false;
   List Videoinfo = [];
+  late VideoPlayerController _controller;
 
   _initData() async {
     await DefaultAssetBundle.of(context)
@@ -270,11 +271,29 @@ class _VideoInfoState extends State<VideoInfo> {
     );
   }
 
-  _playView(BuildContext context) {}
+  _playView(BuildContext context) {
+    final controller = _controller;
+    if (controller != null && controller.value.isInitialized) {
+      return Container(
+        height: 300,
+        width: 300,
+        child: VideoPlayer(controller),
+      );
+    } else {
+      return Text("Being initialized please wait");
+    }
+  }
 
   _onTapVideo(int index) {
     final controller =
         VideoPlayerController.network(Videoinfo[index]['videoUrl']);
+    _controller = controller;
+    setState(() {});
+    controller
+      ..initialize().then((_) {
+        controller.play();
+        setState(() {});
+      });
   }
 
   _listView() {
