@@ -15,8 +15,10 @@ class VideoInfo extends StatefulWidget {
 class _VideoInfoState extends State<VideoInfo> {
   bool _isPlaying = false;
   bool _playArea = false;
+  bool _disposed = false;
+  int _isPlayingIndex = -1;
   List Videoinfo = [];
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
 
   _initData() async {
     await DefaultAssetBundle.of(context)
@@ -32,6 +34,15 @@ class _VideoInfoState extends State<VideoInfo> {
   void initState() {
     super.initState();
     _initData();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _controller?.pause();
+    _controller?.dispose();
+    _controller = null;
+    super.dispose();
   }
 
   @override
@@ -274,91 +285,189 @@ class _VideoInfoState extends State<VideoInfo> {
     );
   }
 
- Widget  _controlView(BuildContext context){
-      return Container(
-        height: 120,
-        width: MediaQuery.of(context).size.width,
-        color: color.AppColor.gradientSecond,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(onPressed: ()async {},
-            child: Icon(Icons.fast_rewind,
-            size: 36,
-            color: Colors.white,),),
-            TextButton(onPressed: ()async {
-              if(_isPlaying){
-               setState(() {
-                 _isPlaying=false;
-               });
-                _controller.pause();
-              }else{
-                setState(() {
-                 _isPlaying=true;
-               });
-                _controller.play();
+  Widget _controlView(BuildContext context) {
+    return Container(
+      height: 120,
+      width: MediaQuery.of(context).size.width,
+      color: color.AppColor.gradientSecond,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          InkWell(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              child: Container(
+                decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                  BoxShadow(
+                    offset: Offset(0.0, 0.0),
+                    blurRadius: 4.0,
+                    color: Color.fromARGB(50, 0, 0, 0),
+                  )
+                ]),
+                child: Icon(
+                  Icons.volume_up,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            // sir continue from here , have added the volume button and now u have to add it's functionality
+          ),
+          TextButton(
+            onPressed: () async {
+              final index = _isPlayingIndex - 1;
+              if (index >= 0 && Videoinfo.length >= 0) {
+                _initializeVideo(index);
+              } else {
+                Get.snackbar("Video List", " ",
+                    snackPosition: SnackPosition.BOTTOM,
+                    icon: Icon(
+                      Icons.face,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                    backgroundColor: color.AppColor.gradientSecond,
+                    colorText: Colors.white,
+                    messageText: Text(
+                      "No videos ahead ! ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ));
               }
             },
-            child: Icon(_isPlaying?Icons.pause:Icons.play_arrow,
-            size: 36,
-            color: Colors.white,),),
-            TextButton(onPressed: ()async {},
-            child: Icon(Icons.fast_forward,
-            size: 36,
-            color: Colors.white,),)
-
-          ],
-        ),
-      );
+            child: Icon(
+              Icons.fast_rewind,
+              size: 36,
+              color: Colors.white,
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (_isPlaying) {
+                setState(() {
+                  _isPlaying = false;
+                });
+                _controller?.pause();
+              } else {
+                setState(() {
+                  _isPlaying = true;
+                });
+                _controller?.play();
+              }
+            },
+            child: Icon(
+              _isPlaying ? Icons.pause : Icons.play_arrow,
+              size: 36,
+              color: Colors.white,
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final index = _isPlayingIndex + 1;
+              if (index <= Videoinfo.length - 1) {
+                _initializeVideo(index);
+              } else {
+                Get.snackbar("Video List", " ",
+                    snackPosition: SnackPosition.BOTTOM,
+                    icon: Icon(
+                      Icons.face,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                    backgroundColor: color.AppColor.gradientSecond,
+                    colorText: Colors.white,
+                    messageText: Text(
+                      "You have finished watching all the videos. Congrats !",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ));
+              }
+            },
+            child: Icon(
+              Icons.fast_forward,
+              size: 36,
+              color: Colors.white,
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   _playView(BuildContext context) {
-    final controller =_controller;
-    if(controller!=null &&controller.value.isInitialized){
+    final controller = _controller;
+    if (controller != null && controller.value.isInitialized) {
       return AspectRatio(
-        aspectRatio: 16/9,
+        aspectRatio: 16 / 9,
         child: VideoPlayer(controller),
       );
-    }else{
+    } else {
       return AspectRatio(
-        aspectRatio: 16/9
-        ,child: Center(child: Text("Preparing...",
-        style: TextStyle(
-          fontSize: 20,
-          color: Colors.white60
-        ),)));
+          aspectRatio: 16 / 9,
+          child: Center(
+              child: Text(
+            "Preparing...",
+            style: TextStyle(fontSize: 20, color: Colors.white60),
+          )));
     }
   }
 
-  void _onControllerupdate() async {
+  var _onUpdateControllerTime;
 
-    final controller =_controller;
-    if(_controller==null){
+  void _onControllerupdate() async {
+    if (_disposed) {
+      return;
+    }
+    _onUpdateControllerTime = 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (_onUpdateControllerTime > now) {
+      return;
+    }
+    _onUpdateControllerTime = now + 500;
+
+    final controller = _controller;
+    if (_controller == null) {
       debugPrint("controller is null ");
-      return ;
+      return;
     }
 
-    if(!controller.value.isInitialized){
+    if (!controller!.value.isInitialized) {
       debugPrint("controller can not be initialised");
       return;
     }
 
     final playing = controller.value.isPlaying;
-    _isPlaying=playing;
-
+    _isPlaying = playing;
   }
 
-  _onTapVideo(int index) {
+  _initializeVideo(int index) async {
     final controller =
         VideoPlayerController.network(Videoinfo[index]['videoUrl']);
+    final old = _controller;
     _controller = controller;
+    if (old != null) {
+      old.removeListener(_onControllerupdate);
+      old.pause();
+    }
     setState(() {});
     controller
       ..initialize().then((_) {
+        old?.dispose();
+        _isPlayingIndex = index;
         controller.addListener(_onControllerupdate);
         controller.play();
         setState(() {});
       });
+  }
+
+  _onTapVideo(int index) {
+    _initializeVideo(index);
   }
 
   _listView() {
