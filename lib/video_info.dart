@@ -209,6 +209,7 @@ class _VideoInfoState extends State<VideoInfo> {
                         ),
                         _playView(context),
                         _controlView(context)
+                        
                       ],
                     ),
                   ),
