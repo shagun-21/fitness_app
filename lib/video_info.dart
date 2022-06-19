@@ -13,6 +13,7 @@ class VideoInfo extends StatefulWidget {
 }
 
 class _VideoInfoState extends State<VideoInfo> {
+  bool _isPlaying = false;
   bool _playArea = false;
   List Videoinfo = [];
   late VideoPlayerController _controller;
@@ -206,7 +207,8 @@ class _VideoInfoState extends State<VideoInfo> {
                             )
                           ]),
                         ),
-                        _playView(context)
+                        _playView(context),
+                        _controlView(context)
                       ],
                     ),
                   ),
@@ -271,17 +273,78 @@ class _VideoInfoState extends State<VideoInfo> {
     );
   }
 
+ Widget  _controlView(BuildContext context){
+      return Container(
+        height: 120,
+        width: MediaQuery.of(context).size.width,
+        color: color.AppColor.gradientSecond,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(onPressed: ()async {},
+            child: Icon(Icons.fast_rewind,
+            size: 36,
+            color: Colors.white,),),
+            TextButton(onPressed: ()async {
+              if(_isPlaying){
+               setState(() {
+                 _isPlaying=false;
+               });
+                _controller.pause();
+              }else{
+                setState(() {
+                 _isPlaying=true;
+               });
+                _controller.play();
+              }
+            },
+            child: Icon(_isPlaying?Icons.pause:Icons.play_arrow,
+            size: 36,
+            color: Colors.white,),),
+            TextButton(onPressed: ()async {},
+            child: Icon(Icons.fast_forward,
+            size: 36,
+            color: Colors.white,),)
+
+          ],
+        ),
+      );
+  }
+
   _playView(BuildContext context) {
     final controller =_controller;
     if(controller!=null &&controller.value.isInitialized){
-      return Container(
-        height: 300,
-        width: 300,
+      return AspectRatio(
+        aspectRatio: 16/9,
         child: VideoPlayer(controller),
       );
     }else{
-      return Text("Being initialized please wait");
+      return AspectRatio(
+        aspectRatio: 16/9
+        ,child: Center(child: Text("Preparing...",
+        style: TextStyle(
+          fontSize: 20,
+          color: Colors.white60
+        ),)));
     }
+  }
+
+  void _onControllerupdate() async {
+
+    final controller =_controller;
+    if(_controller==null){
+      debugPrint("controller is null ");
+      return ;
+    }
+
+    if(!controller.value.isInitialized){
+      debugPrint("controller can not be initialised");
+      return;
+    }
+
+    final playing = controller.value.isPlaying;
+    _isPlaying=playing;
+
   }
 
   _onTapVideo(int index) {
@@ -291,6 +354,7 @@ class _VideoInfoState extends State<VideoInfo> {
     setState(() {});
     controller
       ..initialize().then((_) {
+        controller.addListener(_onControllerupdate);
         controller.play();
         setState(() {});
       });
@@ -323,7 +387,6 @@ class _VideoInfoState extends State<VideoInfo> {
       height: 135,
       child: Column(
         children: [
-          //Isha continue from here
           Row(
             children: [
               Container(
