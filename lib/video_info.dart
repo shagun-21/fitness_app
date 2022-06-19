@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -202,7 +203,7 @@ class _VideoInfoState extends State<VideoInfo> {
                           child: Row(children: [
                             InkWell(
                               onTap: () {
-                                debugPrint("tapped");
+                                Get.back();
                               },
                               child: Icon(
                                 Icons.arrow_back_ios,
@@ -284,119 +285,203 @@ class _VideoInfoState extends State<VideoInfo> {
       ),
     );
   }
+  String convertTwo(int value){
+    return value<10? "0$value" :"$value";
+  }
 
   Widget _controlView(BuildContext context) {
-    return Container(
-      height: 120,
-      width: MediaQuery.of(context).size.width,
-      color: color.AppColor.gradientSecond,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          InkWell(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
+    final noMute= (_controller?.value?.volume??0)>0;
+    final duration = _duration?.inSeconds??0;
+    final head = _position?.inSeconds??0;
+    final remained = max(0, duration-head);
+    final mins = convertTwo(remained ~/60.0);
+    final secs=convertTwo(remained % 60);
+
+ 
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SliderTheme(data: SliderTheme.of(context).copyWith(
+          inactiveTrackColor: Colors.red[100],
+          activeTrackColor: Colors.red[700],
+          trackShape: RoundedRectSliderTrackShape(),
+          trackHeight: 2,
+          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12),
+          thumbColor: Colors.redAccent,
+          overlayColor: Colors.red.withAlpha(32),
+          overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+          tickMarkShape: RoundSliderTickMarkShape(),
+          activeTickMarkColor: Colors.red[700],
+          inactiveTickMarkColor: Colors.red[100],
+          valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+          valueIndicatorColor: Colors.redAccent,
+          valueIndicatorTextStyle: TextStyle(
+            color: Colors.white
+          ),
+          
+        ), child: Slider(
+          value: max(0, min(_progress*100,100)),
+          min: 0,
+          max: 100,
+          divisions: 100,
+          label: _position?.toString().split(".")[0],
+          onChanged: (value){
+            setState(() {
+              _progress=value*0.01;
+            });
+          },
+          onChangeStart:(value){
+            _controller?.pause();
+          } ,
+          onChangeEnd: (value){
+            final duration=_controller?.value?.duration;
+            if(duration!=null){
+              var newValue = max(0, min(value,99))*0.01;
+              var millis=(duration.inMilliseconds*newValue).toInt();
+              _controller?.seekTo(Duration(milliseconds: millis));
+              _controller?.play();
+
+            }
+          },
+        )),
+        Container(
+          margin: const EdgeInsets.only(bottom: 5),
+          height: 40,
+          width: MediaQuery.of(context).size.width,
+          color: color.AppColor.gradientSecond,
+          child: Row(
+            //crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              
+              InkWell(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                      BoxShadow(
+                        offset: Offset(0.0, 0.0),
+                        blurRadius: 4.0,
+                        color: Color.fromARGB(50, 0, 0, 0),
+                      )
+                    ]),
+                    child: Icon(
+                      noMute?Icons.volume_up:Icons.volume_off,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+
+                // sir continue from here , have added the volume button and now u have to add it's functionality
+
+                onTap: (){
+                      if(noMute){
+                        _controller?.setVolume(0);
+                      }else{
+                        _controller?.setVolume(1);
+                      }
+                      setState(() {
+                        
+                      });
+                },
               ),
-              child: Container(
-                decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0.0, 0.0),
-                    blurRadius: 4.0,
-                    color: Color.fromARGB(50, 0, 0, 0),
-                  )
-                ]),
+              TextButton(
+                onPressed: () async {
+                  final index = _isPlayingIndex - 1;
+                  if (index >= 0 && Videoinfo.length >= 0) {
+                    _initializeVideo(index);
+                  } else {
+                    Get.snackbar("Video List", " ",
+                        snackPosition: SnackPosition.BOTTOM,
+                        icon: Icon(
+                          Icons.face,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                        backgroundColor: color.AppColor.gradientSecond,
+                        colorText: Colors.white,
+                        messageText: Text(
+                          "No videos ahead ! ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ));
+                  }
+                },
                 child: Icon(
-                  Icons.volume_up,
+                  Icons.fast_rewind,
+                  size: 36,
                   color: Colors.white,
                 ),
               ),
-            ),
-            // sir continue from here , have added the volume button and now u have to add it's functionality
+              TextButton(
+                onPressed: () async {
+                  if (_isPlaying) {
+                    setState(() {
+                      _isPlaying = false;
+                    });
+                    _controller?.pause();
+                  } else {
+                    setState(() {
+                      _isPlaying = true;
+                    });
+                    _controller?.play();
+                  }
+                },
+                child: Icon(
+                  _isPlaying ? Icons.pause : Icons.play_arrow,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final index = _isPlayingIndex + 1;
+                  if (index <= Videoinfo.length - 1) {
+                    _initializeVideo(index);
+                  } else {
+                    Get.snackbar("Video List", " ",
+                        snackPosition: SnackPosition.BOTTOM,
+                        icon: Icon(
+                          Icons.face,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                        backgroundColor: color.AppColor.gradientSecond,
+                        colorText: Colors.white,
+                        messageText: Text(
+                          "You have finished watching all the videos. Congrats !",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ));
+                  }
+                },
+                child: Icon(
+                  Icons.fast_forward,
+                  size: 36,
+                  color: Colors.white,
+                ),
+              ),
+              Text("$mins:$secs",
+              style: TextStyle(
+                color: Colors.white,
+                shadows: <Shadow>[
+                  Shadow(blurRadius: 4.0,
+                  offset: Offset(0.0, 1.0),
+                  color: Color.fromARGB(150, 0, 0, 0))
+                ]
+              ),),
+
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              final index = _isPlayingIndex - 1;
-              if (index >= 0 && Videoinfo.length >= 0) {
-                _initializeVideo(index);
-              } else {
-                Get.snackbar("Video List", " ",
-                    snackPosition: SnackPosition.BOTTOM,
-                    icon: Icon(
-                      Icons.face,
-                      size: 30,
-                      color: Colors.white,
-                    ),
-                    backgroundColor: color.AppColor.gradientSecond,
-                    colorText: Colors.white,
-                    messageText: Text(
-                      "No videos ahead ! ",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ));
-              }
-            },
-            child: Icon(
-              Icons.fast_rewind,
-              size: 36,
-              color: Colors.white,
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              if (_isPlaying) {
-                setState(() {
-                  _isPlaying = false;
-                });
-                _controller?.pause();
-              } else {
-                setState(() {
-                  _isPlaying = true;
-                });
-                _controller?.play();
-              }
-            },
-            child: Icon(
-              _isPlaying ? Icons.pause : Icons.play_arrow,
-              size: 36,
-              color: Colors.white,
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              final index = _isPlayingIndex + 1;
-              if (index <= Videoinfo.length - 1) {
-                _initializeVideo(index);
-              } else {
-                Get.snackbar("Video List", " ",
-                    snackPosition: SnackPosition.BOTTOM,
-                    icon: Icon(
-                      Icons.face,
-                      size: 30,
-                      color: Colors.white,
-                    ),
-                    backgroundColor: color.AppColor.gradientSecond,
-                    colorText: Colors.white,
-                    messageText: Text(
-                      "You have finished watching all the videos. Congrats !",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ));
-              }
-            },
-            child: Icon(
-              Icons.fast_forward,
-              size: 36,
-              color: Colors.white,
-            ),
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -419,6 +504,11 @@ class _VideoInfoState extends State<VideoInfo> {
   }
 
   var _onUpdateControllerTime;
+  Duration? _duration;
+  Duration? _position;
+
+  var _progress=0.0;
+
 
   void _onControllerupdate() async {
     if (_disposed) {
@@ -442,7 +532,25 @@ class _VideoInfoState extends State<VideoInfo> {
       return;
     }
 
+    if(_duration ==null){
+      _duration = _controller?.value.duration;
+    }
+
+    var duration = _duration;
+    if(duration== null) return;
+
+    var position = await controller.position;
+    _position=position;
+     
+
     final playing = controller.value.isPlaying;
+    if(playing){
+      //handle progress indicator
+      if(_disposed) return;
+      setState(() {
+        _progress =position!.inMilliseconds.ceilToDouble()/duration.inMilliseconds.ceilToDouble();
+      });
+    }
     _isPlaying = playing;
   }
 
